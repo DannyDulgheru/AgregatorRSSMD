@@ -1,0 +1,29 @@
+# Database
+data/*.sqlite
+data/*.db
+data/*.sqlite-journal
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Environment
+.env
+.env.local
