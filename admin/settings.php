@@ -18,7 +18,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (verifyCSRFToken($_POST['csrf_token'] ?? '')) {
         $action = $_POST['action'] ?? '';
         
-        if ($action === 'scrape_all') {
+        if ($action === 'change_password') {
+            $currentPassword = $_POST['current_password'] ?? '';
+            $newPassword = $_POST['new_password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+            
+            if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                $message = 'Toate câmpurile sunt obligatorii.';
+                $messageType = 'error';
+            } elseif ($newPassword !== $confirmPassword) {
+                $message = 'Parolele noi nu se potrivesc.';
+                $messageType = 'error';
+            } elseif (strlen($newPassword) < 6) {
+                $message = 'Parola nouă trebuie să aibă minim 6 caractere.';
+                $messageType = 'error';
+            } else {
+                $result = changeAdminPassword($currentPassword, $newPassword);
+                $message = $result['message'];
+                $messageType = $result['success'] ? 'success' : 'error';
+            }
+        } elseif ($action === 'scrape_all') {
             $results = scrapeAllSites();
             $successCount = 0;
             $totalCount = 0;
@@ -95,6 +114,32 @@ $itemsPerPage = getSetting('items_per_page', ARTICLES_PER_PAGE);
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Salvează Setările</button>
+                </form>
+            </div>
+            
+            <div class="admin-section">
+                <h2>Schimbă Parola</h2>
+                <form method="POST" class="admin-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+                    <input type="hidden" name="action" value="change_password">
+                    
+                    <div class="form-group">
+                        <label for="current_password">Parola Curentă:</label>
+                        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new_password">Parola Nouă:</label>
+                        <input type="password" id="new_password" name="new_password" required minlength="6" autocomplete="new-password">
+                        <small style="color: #666;">Minim 6 caractere</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmă Parola Nouă:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required minlength="6" autocomplete="new-password">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">🔒 Schimbă Parola</button>
                 </form>
             </div>
             

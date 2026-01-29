@@ -7,7 +7,7 @@ require_once __DIR__ . '/../includes/auth.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
-    header('Location: index.php');
+    header('Location: /admin');
     exit;
 }
 
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Vă rugăm completați toate câmpurile.';
     } else {
         if (login($username, $password)) {
-            header('Location: index.php');
+            header('Location: /admin');
             exit;
         } else {
             $error = 'Utilizator sau parolă incorectă.';

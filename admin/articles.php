@@ -108,7 +108,7 @@ $sites = getNewsSites();
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Filtrează</button>
-                    <a href="articles.php" class="btn btn-outline">Resetează</a>
+                    <a href="/admin/articles" class="btn btn-outline">Resetează</a>
                 </form>
             </div>
             
@@ -142,7 +142,7 @@ $sites = getNewsSites();
                                         <td><?php echo e($article['site_name'] ?? 'N/A'); ?></td>
                                         <td><?php echo formatDate($article['published_at']); ?></td>
                                         <td>
-                                            <a href="/article.php?id=<?php echo $article['id']; ?>" target="_blank" class="btn btn-sm">Vezi</a>
+                                            <a href="/article?id=<?php echo $article['id']; ?>" target="_blank" class="btn btn-sm">Vezi</a>
                                             <form method="POST" style="display: inline;" onsubmit="return confirm('Sigur doriți să ștergeți acest articol?');">
                                                 <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                                                 <input type="hidden" name="action" value="delete">

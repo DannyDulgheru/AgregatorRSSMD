@@ -28,13 +28,43 @@ Options -Indexes
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Pretty URLs (optional)
-# RewriteCond %{REQUEST_FILENAME} !-f
-# RewriteCond %{REQUEST_FILENAME} !-d
-# RewriteRule ^article/([0-9]+)$ article.php?id=$1 [L,QSA]
+# Redirect old .php URLs to clean URLs (301 Permanent)
+Redirect 301 /article.php /article
+Redirect 301 /tags.php /tags
+Redirect 301 /about.php /about
+
+# Clean URLs - Rewrite Rules
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Article pages: /article/123 format
+RewriteRule ^article/([0-9]+)$ article/index.php?id=$1 [L,QSA]
+RewriteRule ^article$ article/index.php [L,QSA]
+
+# Tags page
+RewriteRule ^tags$ tags/index.php [L]
+
+# About page
+RewriteRule ^about$ about/index.php [L]
+
+# Admin panel clean URLs
+RewriteRule ^admin$ admin/index.php [L]
+RewriteRule ^admin/login$ admin/login.php [L]
+RewriteRule ^admin/logout$ admin/logout.php [L]
+RewriteRule ^admin/sites$ admin/sites.php [L]
+RewriteRule ^admin/articles$ admin/articles.php [L]
+RewriteRule ^admin/settings$ admin/settings.php [L]
+
+# Sitemap (dynamic PHP-generated XML)
+RewriteRule ^sitemap\.xml$ sitemap.xml.php [L]
 
 # Set default charset
 AddDefaultCharset UTF-8
+
+# Cache Control for HTML (force refresh after migration)
+<FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
 
 # Enable compression
 <IfModule mod_deflate.c>

@@ -20,7 +20,7 @@ function isLoggedIn() {
  */
 function requireLogin() {
     if (!isLoggedIn()) {
-        header('Location: /admin/login.php');
+        header('Location: /admin/login');
         exit;
     }
 }
@@ -72,4 +72,34 @@ function generateCSRFToken() {
  */
 function verifyCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Change admin password
+ */
+function changeAdminPassword($currentPassword, $newPassword) {
+    require_once __DIR__ . '/../config/database.php';
+    $db = getDB();
+    
+    // Get current user
+    $userId = $_SESSION['admin_id'] ?? null;
+    if (!$userId) {
+        return ['success' => false, 'message' => 'User ID not found in session'];
+    }
+    
+    // Verify current password
+    $stmt = $db->prepare("SELECT password_hash FROM admin_users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch();
+    
+    if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
+        return ['success' => false, 'message' => 'Parola curentă este incorectă'];
+    }
+    
+    // Update password
+    $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+    $updateStmt = $db->prepare("UPDATE admin_users SET password_hash = ? WHERE id = ?");
+    $updateStmt->execute([$newHash, $userId]);
+    
+    return ['success' => true, 'message' => 'Parola a fost schimbată cu succes'];
 }

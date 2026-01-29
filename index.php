@@ -5,21 +5,31 @@
 
 require_once __DIR__ . '/includes/functions.php';
 
+// Get active theme
+$activeTheme = getSetting('active_theme', 'default');
+
 // Get filters
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $siteFilter = isset($_GET['site']) ? intval($_GET['site']) : null;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'date';
+$tagFilter = isset($_GET['tag']) ? trim($_GET['tag']) : '';
 
 // Get view mode from cookie/localStorage (will be handled by JS)
 $viewMode = isset($_COOKIE['view_mode']) ? $_COOKIE['view_mode'] : 'grid';
 
-// Get top articles (only on first page)
-$topArticles = ($page == 1) ? getTopArticles(5) : [];
+// Get top articles (only on first page, not when filtering by tag)
+$topArticles = ($page == 1 && !$tagFilter) ? getTopArticles(6) : [];
 
-// Get articles
-$articles = getArticles($page, ARTICLES_PER_PAGE, $siteFilter, $search, $sortBy);
-$totalArticles = getArticlesCount($siteFilter, $search);
+// Get articles - check if filtering by tag
+if ($tagFilter) {
+    $articles = getArticlesByTag($tagFilter, $page, ARTICLES_PER_PAGE);
+    $totalArticles = count($articles); // Simplified count for tag filter
+    $search = ''; // Clear search when using tag filter
+} else {
+    $articles = getArticles($page, ARTICLES_PER_PAGE, $siteFilter, $search, $sortBy);
+    $totalArticles = getArticlesCount($siteFilter, $search);
+}
 $totalPages = ceil($totalArticles / ARTICLES_PER_PAGE);
 
 // Get news sites for filter
@@ -35,21 +45,24 @@ $siteTitle = getSetting('site_title', SITE_NAME);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($siteTitle); ?></title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/themes.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <script>document.documentElement.setAttribute('data-theme', '<?php echo $activeTheme; ?>');</script>
     <header class="main-header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1><?php echo e($siteTitle); ?></h1>
-                    <p class="tagline">Agregator Știri Republica Moldova</p>
+                    <h1><a href="/"><?php echo e($siteTitle); ?></a></h1>
                 </div>
                 <nav class="main-nav">
-                    <a href="/" class="nav-link active">Acasă</a>
-                    <a href="/admin" class="nav-link">Admin</a>
+                    <a href="/" class="nav-link">Acasă</a>
+                    <a href="/zen" class="nav-link">🧘 ZEN Mode</a>
+                    <a href="/tags" class="nav-link">Taguri</a>
+                    <a href="/about" class="nav-link">Despre</a>
                 </nav>
             </div>
         </div>
@@ -172,14 +185,14 @@ $siteTitle = getSetting('site_title', SITE_NAME);
                         <?php foreach ($topArticles as $top): ?>
                             <article class="top-news-card">
                                 <?php if ($top['image_url']): ?>
-                                    <div class="top-news-image">
-                                        <a href="/article.php?id=<?php echo $top['id']; ?>">
-                                            <img src="<?php echo e($top['image_url']); ?>" 
-                                                 alt="<?php echo e($top['title']); ?>"
-                                                 loading="lazy"
-                                                 onerror="this.style.display='none';">
-                                        </a>
-                                    </div>
+                                <div class="top-news-image">
+                                    <a href="/article?id=<?php echo $top['id']; ?>">
+                                        <img src="<?php echo e($top['image_url']); ?>" 
+                                             alt="<?php echo e($top['title']); ?>"
+                                             loading="lazy"
+                                             onerror="this.parentElement.parentElement.style.display='none';">
+                                    </a>
+                                </div>
                                 <?php endif; ?>
                                 <div class="top-news-content">
                                     <div class="top-news-meta">
@@ -187,7 +200,15 @@ $siteTitle = getSetting('site_title', SITE_NAME);
                                         <span class="article-date"><?php echo formatDate($top['published_at']); ?></span>
                                     </div>
                                     <h3 class="top-news-title">
-                                        <a href="/article.php?id=<?php echo $top['id']; ?>">
+                                        <?php 
+                                        // Show NEW badge if article was published in last 15 minutes
+                                        $publishedTime = strtotime($top['published_at']);
+                                        $fifteenMinutesAgo = time() - (15 * 60);
+                                        if ($publishedTime > $fifteenMinutesAgo): 
+                                        ?>
+                                            <span class="badge-new">NOU</span>
+                                        <?php endif; ?>
+                                        <a href="/article/<?php echo $top['id']; ?>">
                                             <?php echo e($top['title']); ?>
                                         </a>
                                     </h3>
@@ -223,16 +244,19 @@ $siteTitle = getSetting('site_title', SITE_NAME);
             <?php else: ?>
                 <div class="articles-container" id="articlesContainer" data-view-mode="<?php echo e($viewMode); ?>" style="max-width: 100%;">
                     <?php foreach ($articles as $article): ?>
-                        <article class="article-card" data-view-mode="<?php echo e($viewMode); ?>">
+                        <article class="article-card" data-view-mode="<?php echo e($viewMode); ?>"
+                                 data-article-image="<?php echo e($article['image_url'] ?? ''); ?>"
+                                 data-article-content="<?php echo e($article['content'] ?? ''); ?>"
+                                 data-article-title="<?php echo e($article['title']); ?>">
                             <?php if ($article['image_url']): ?>
-                                <div class="article-image">
-                                    <a href="/article.php?id=<?php echo $article['id']; ?>">
-                                        <img src="<?php echo e($article['image_url']); ?>" 
-                                             alt="<?php echo e($article['title']); ?>"
-                                             loading="lazy"
-                                             onerror="this.style.display='none';">
-                                    </a>
-                                </div>
+                            <div class="article-image">
+                                <a href="/article?id=<?php echo $article['id']; ?>">
+                                    <img src="<?php echo e($article['image_url']); ?>" 
+                                         alt="<?php echo e($article['title']); ?>"
+                                         loading="lazy"
+                                         onerror="this.parentElement.parentElement.style.display='none';">
+                                </a>
+                            </div>
                             <?php endif; ?>
                             
                             <div class="article-content">
@@ -242,7 +266,15 @@ $siteTitle = getSetting('site_title', SITE_NAME);
                                 </div>
                                 
                                 <h2 class="article-title">
-                                    <a href="/article.php?id=<?php echo $article['id']; ?>">
+                                    <?php 
+                                    // Show NEW badge if article was published in last 15 minutes
+                                    $publishedTime = strtotime($article['published_at']);
+                                    $fifteenMinutesAgo = time() - (15 * 60);
+                                    if ($publishedTime > $fifteenMinutesAgo): 
+                                    ?>
+                                        <span class="badge-new">NOU</span>
+                                    <?php endif; ?>
+                                    <a href="/article/<?php echo $article['id']; ?>">
                                         <?php echo e($article['title']); ?>
                                     </a>
                                 </h2>
@@ -252,7 +284,7 @@ $siteTitle = getSetting('site_title', SITE_NAME);
                                 <?php endif; ?>
                                 
                                 <div class="article-footer">
-                                    <a href="/article.php?id=<?php echo $article['id']; ?>" class="btn btn-sm btn-primary">Citește mai mult</a>
+                                    <a href="/article/<?php echo $article['id']; ?>" class="btn btn-sm btn-primary">Citește mai mult</a>
                                     <a href="<?php echo e($article['source_url']); ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Sursa originală</a>
                                 </div>
                             </div>
@@ -277,8 +309,32 @@ $siteTitle = getSetting('site_title', SITE_NAME);
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
+            
+            <!-- Popular Tags Section -->
+            <div class="popular-tags-section">
+                <h3>Taguri Populare</h3>
+                <div class="tags-cloud">
+                    <?php 
+                    $popularTags = getPopularTags(25);
+                    foreach ($popularTags as $tag => $count): 
+                    ?>
+                        <a href="?tag=<?php echo urlencode($tag); ?>" class="tag-item" data-count="<?php echo $count; ?>">
+                            <?php echo e($tag); ?> <span class="tag-count">(<?php echo $count; ?>)</span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     </main>
+    
+    <!-- Compact View Hover Preview -->
+    <div id="compactPreview" class="compact-preview-tooltip">
+        <div class="preview-image"></div>
+        <div class="preview-content">
+            <h4 class="preview-title"></h4>
+            <p class="preview-text"></p>
+        </div>
+    </div>
     
     <footer class="main-footer">
         <div class="container">

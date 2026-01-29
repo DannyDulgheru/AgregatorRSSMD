@@ -356,10 +356,13 @@ function scrapeSite($siteId) {
                 continue; // Skip duplicates
             }
             
+            // Generate tags
+            $tags = generateTags($article['title'], $article['content'] ?? '');
+            
             // Insert article
             $insertStmt = $db->prepare("INSERT INTO articles 
-                (site_id, title, image_url, content, source_url, published_at, scraped_at, unique_hash) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                (site_id, title, image_url, content, source_url, published_at, scraped_at, unique_hash, tags) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             $insertStmt->execute([
                 $site['id'],
@@ -369,7 +372,8 @@ function scrapeSite($siteId) {
                 $article['source_url'],
                 $article['published_at'],
                 date('Y-m-d H:i:s'),
-                $hash
+                $hash,
+                $tags
             ]);
             
             $scrapedCount++;

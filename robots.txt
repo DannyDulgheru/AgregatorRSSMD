@@ -1,0 +1,38 @@
+# Robots.txt pentru Agregator Știri Moldova
+# Generated: <?php echo date('Y-m-d H:i:s'); ?>
+
+
+User-agent: *
+
+# Allow indexing of main content
+Allow: /
+Allow: /article/
+Allow: /tags
+Allow: /about
+
+# Disallow admin and cron directories
+Disallow: /admin/
+Disallow: /cron/
+Disallow: /data/
+Disallow: /config/
+Disallow: /includes/
+
+# Disallow direct PHP file access (use clean URLs)
+Disallow: /*.php$
+
+# Sitemap location
+Sitemap: <?php echo $protocol ?? 'http'; ?>://<?php echo $_SERVER['HTTP_HOST'] ?? 'localhost'; ?>/sitemap.xml
+
+# Crawl delay (be nice to our server)
+Crawl-delay: 5
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Crawl-delay: 2
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Crawl-delay: 3

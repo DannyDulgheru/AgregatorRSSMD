@@ -13,7 +13,7 @@ require_once __DIR__ . '/../includes/functions.php';
         </div>
         <div class="admin-user">
             <span>Bună, <strong><?php echo e($_SESSION['admin_username']); ?></strong></span>
-            <a href="logout.php" class="btn btn-sm btn-outline">Deconectare</a>
+            <a href="/admin/logout" class="btn btn-sm btn-outline">Deconectare</a>
         </div>
     </div>
 </header>

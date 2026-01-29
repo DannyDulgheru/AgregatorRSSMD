@@ -165,7 +165,7 @@ if (isset($_GET['edit'])) {
                         <?php echo $editSite ? 'Actualizează' : 'Adaugă'; ?>
                     </button>
                     <?php if ($editSite): ?>
-                        <a href="sites.php" class="btn btn-outline">Anulează</a>
+                        <a href="/admin/sites" class="btn btn-outline">Anulează</a>
                     <?php endif; ?>
                 </form>
             </div>

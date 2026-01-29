@@ -7,7 +7,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <nav class="admin-nav">
     <ul>
         <li>
-            <a href="/admin/index.php" class="<?php echo $currentPage === 'index.php' ? 'active' : ''; ?>">
+            <a href="/admin" class="<?php echo $currentPage === 'index.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">📊</span>
                 Dashboard
             </a>

@@ -129,7 +129,7 @@ $sites = $db->query("SELECT * FROM news_sites ORDER BY name ASC")->fetchAll();
                                         <td><?php echo e($article['site_name'] ?? 'N/A'); ?></td>
                                         <td><?php echo formatDate($article['scraped_at']); ?></td>
                                         <td>
-                                            <a href="/article.php?id=<?php echo $article['id']; ?>" target="_blank" class="btn btn-sm">Vezi</a>
+                                            <a href="/article?id=<?php echo $article['id']; ?>" target="_blank" class="btn btn-sm">Vezi</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
