@@ -1,3 +1,8 @@
+# Database - Include SQLite files for this project
+# data/*.sqlite
+# data/*.db
+# data/*.sqlite-journal
+
 # Logs
 *.log
 logs/
