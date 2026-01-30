@@ -13,6 +13,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li>
+            <a href="/admin/statistics.php" class="<?php echo $currentPage === 'statistics.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">📈</span>
+                Statistici
+            </a>
+        </li>
+        <li>
             <a href="/admin/sites.php" class="<?php echo $currentPage === 'sites.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🌐</span>
                 Site-uri Știri

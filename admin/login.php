@@ -61,11 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <button type="submit" class="btn btn-primary">Conectare</button>
             </form>
-            
-            <div class="login-info">
-                <p>Utilizator default: <strong>admin</strong></p>
-                <p>Parolă default: <strong>pass</strong></p>
-            </div>
         </div>
     </div>
 </body>

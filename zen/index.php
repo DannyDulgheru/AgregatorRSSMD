@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/tracker.php';
 
 $siteTitle = getSetting('site_title', SITE_NAME);
 $activeTheme = getSetting('active_theme', 'default');
@@ -161,6 +162,18 @@ if ($isAjax) {
         </div>
     </main>
     
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; <?php echo date('Y'); ?> <?php echo e($siteTitle); ?>. Toate drepturile rezervate.</p>
+            <p>Agregator de știri din Republica Moldova</p>
+            <div class="footer-links">
+                <a href="/about">Despre</a>
+                <a href="/privacy">Politica de Confidențialitate</a>
+                <a href="/terms">Termeni și Condiții</a>
+            </div>
+        </div>
+    </footer>
+    
     <!-- Zen Preview Tooltip -->
     <div id="zenPreview" class="zen-preview-tooltip">
         <div class="zen-preview-image"></div>
@@ -176,3 +189,4 @@ if ($isAjax) {
     <script src="/assets/js/zen.js"></script>
 </body>
 </html>
+

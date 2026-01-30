@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/tracker.php';
 
 // Get active theme
 $activeTheme = getSetting('active_theme', 'default');
@@ -221,6 +222,61 @@ $siteTitle = getSetting('site_title', SITE_NAME);
             
             <!-- Sort and Filter Section -->
             <div class="sort-section">
+                <!-- Filters on Mobile (inside sort section) -->
+                <div class="filters-section">
+                    <form method="GET" class="filters-form" id="filtersFormTop">
+                        <div class="filter-group">
+                            <label for="search-top">Căutare:</label>
+                            <input type="text" id="search-top" name="search" value="<?php echo e($search); ?>" placeholder="Caută știri...">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="site-top">Sursă:</label>
+                            <select id="site-top" name="site">
+                                <option value="">Toate sursele</option>
+                                <?php foreach ($sites as $site): ?>
+                                    <option value="<?php echo $site['id']; ?>" <?php echo $siteFilter == $site['id'] ? 'selected' : ''; ?>>
+                                        <?php echo e($site['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Filtrează</button>
+                        <?php if ($search || $siteFilter): ?>
+                            <a href="/" class="btn btn-outline">Resetează</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
+                
+                <!-- View Mode Toggle for Mobile -->
+                <div class="view-controls-top hidden">
+                    <span class="view-label">Vizualizare:</span>
+                    <button class="view-btn active" data-view="grid" title="Grid">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="2" width="7" height="7" rx="1"/>
+                            <rect x="11" y="2" width="7" height="7" rx="1"/>
+                            <rect x="2" y="11" width="7" height="7" rx="1"/>
+                            <rect x="11" y="11" width="7" height="7" rx="1"/>
+                        </svg>
+                    </button>
+                    <button class="view-btn" data-view="list" title="Listă">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="3" width="16" height="2" rx="1"/>
+                            <rect x="2" y="9" width="16" height="2" rx="1"/>
+                            <rect x="2" y="15" width="16" height="2" rx="1"/>
+                        </svg>
+                    </button>
+                    <button class="view-btn" data-view="compact" title="Compact">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="4" width="16" height="1.5" rx="0.75"/>
+                            <rect x="2" y="8" width="12" height="1.5" rx="0.75"/>
+                            <rect x="2" y="12" width="16" height="1.5" rx="0.75"/>
+                            <rect x="2" y="16" width="10" height="1.5" rx="0.75"/>
+                        </svg>
+                    </button>
+                </div>
+                
                 <div class="results-info">
                     <p>Găsite <strong><?php echo number_format($totalArticles); ?></strong> articole</p>
                 </div>
@@ -340,6 +396,11 @@ $siteTitle = getSetting('site_title', SITE_NAME);
         <div class="container">
             <p>&copy; <?php echo date('Y'); ?> <?php echo e($siteTitle); ?>. Toate drepturile rezervate.</p>
             <p>Agregator de știri din Republica Moldova</p>
+            <div class="footer-links">
+                <a href="/about">Despre</a>
+                <a href="/privacy">Politica de Confidențialitate</a>
+                <a href="/terms">Termeni și Condiții</a>
+            </div>
         </div>
     </footer>
     

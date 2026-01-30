@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/tracker.php';
 
 // Extract article ID from URL
 $articleId = null;
@@ -285,9 +286,16 @@ $pageTitle = e($article['title']) . ' - ' . SITE_NAME;
     <footer class="site-footer">
         <div class="container">
             <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. Toate drepturile rezervate.</p>
+            <p>Agregator de știri din Republica Moldova</p>
+            <div class="footer-links">
+                <a href="/about">Despre</a>
+                <a href="/privacy">Politica de Confidențialitate</a>
+                <a href="/terms">Termeni și Condiții</a>
+            </div>
         </div>
     </footer>
 
     <script src="/assets/js/main.js"></script>
 </body>
 </html>
+

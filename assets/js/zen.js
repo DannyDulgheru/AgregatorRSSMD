@@ -5,6 +5,69 @@
 (function() {
     'use strict';
     
+    // Visited links tracking (shared with main.js)
+    const visitedLinksKey = 'visited_articles';
+    
+    // Get visited articles from localStorage
+    function getVisitedArticles() {
+        try {
+            const visited = localStorage.getItem(visitedLinksKey);
+            return visited ? JSON.parse(visited) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+    
+    // Save visited article
+    function markArticleAsVisited(url) {
+        const visited = getVisitedArticles();
+        if (!visited.includes(url)) {
+            visited.push(url);
+            // Keep only last 1000 visited articles to avoid storage issues
+            if (visited.length > 1000) {
+                visited.shift();
+            }
+            try {
+                localStorage.setItem(visitedLinksKey, JSON.stringify(visited));
+            } catch (e) {
+                console.warn('Could not save visited article to localStorage:', e);
+            }
+        }
+    }
+    
+    // Apply visited state to all article links
+    function applyVisitedState() {
+        const visited = getVisitedArticles();
+        
+        // Mark zen article title links as visited
+        document.querySelectorAll('.zen-article-title a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href) return;
+            
+            // For ZEN mode, we track by URL since it goes to external sources
+            if (visited.includes(href)) {
+                link.classList.add('visited');
+            }
+        });
+    }
+    
+    // Track clicks on article links
+    function trackArticleClicks() {
+        document.querySelectorAll('.zen-article-title a').forEach(link => {
+            link.addEventListener('click', function() {
+                const href = this.getAttribute('href');
+                if (href) {
+                    markArticleAsVisited(href);
+                    this.classList.add('visited');
+                }
+            });
+        });
+    }
+    
+    // Initialize visited links tracking
+    applyVisitedState();
+    trackArticleClicks();
+    
     const previewTooltip = document.getElementById('zenPreview');
     if (!previewTooltip) return;
     
@@ -88,6 +151,10 @@
                 hidePreview();
             });
         });
+        
+        // Reapply visited state and tracking after new content is loaded
+        applyVisitedState();
+        trackArticleClicks();
     }
     
     // Initial attach

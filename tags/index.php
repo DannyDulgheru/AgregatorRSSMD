@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/tracker.php';
 
 $siteTitle = getSetting('site_title', SITE_NAME);
 $activeTheme = getSetting('active_theme', 'default');
@@ -116,9 +117,15 @@ $popularTags = getPopularTags(100);
         <div class="container">
             <p>&copy; <?php echo date('Y'); ?> <?php echo e($siteTitle); ?>. Toate drepturile rezervate.</p>
             <p>Agregator de știri din Republica Moldova</p>
+            <div class="footer-links">
+                <a href="/about">Despre</a>
+                <a href="/privacy">Politica de Confidențialitate</a>
+                <a href="/terms">Termeni și Condiții</a>
+            </div>
         </div>
     </footer>
     
     <script src="/assets/js/tags.js"></script>
 </body>
 </html>
+

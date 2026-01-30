@@ -5,6 +5,78 @@
 (function() {
     'use strict';
     
+    // Visited links tracking
+    const visitedLinksKey = 'visited_articles';
+    
+    // Get visited articles from localStorage
+    function getVisitedArticles() {
+        try {
+            const visited = localStorage.getItem(visitedLinksKey);
+            return visited ? JSON.parse(visited) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+    
+    // Save visited article
+    function markArticleAsVisited(articleId) {
+        const visited = getVisitedArticles();
+        if (!visited.includes(articleId)) {
+            visited.push(articleId);
+            // Keep only last 1000 visited articles to avoid storage issues
+            if (visited.length > 1000) {
+                visited.shift();
+            }
+            try {
+                localStorage.setItem(visitedLinksKey, JSON.stringify(visited));
+            } catch (e) {
+                console.warn('Could not save visited article to localStorage:', e);
+            }
+        }
+    }
+    
+    // Apply visited state to all article links
+    function applyVisitedState() {
+        const visited = getVisitedArticles();
+        
+        // Mark article title links as visited
+        document.querySelectorAll('.article-title a, .top-news-title a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href) return;
+            
+            // Extract article ID from URL (/article/123 or /article?id=123)
+            const match = href.match(/\/article\/(\d+)/) || href.match(/[?&]id=(\d+)/);
+            if (match && match[1]) {
+                const articleId = match[1];
+                if (visited.includes(articleId)) {
+                    link.classList.add('visited');
+                }
+            }
+        });
+    }
+    
+    // Track clicks on article links
+    function trackArticleClicks() {
+        document.querySelectorAll('.article-title a, .top-news-title a').forEach(link => {
+            link.addEventListener('click', function() {
+                const href = this.getAttribute('href');
+                if (!href) return;
+                
+                // Extract article ID
+                const match = href.match(/\/article\/(\d+)/) || href.match(/[?&]id=(\d+)/);
+                if (match && match[1]) {
+                    const articleId = match[1];
+                    markArticleAsVisited(articleId);
+                    this.classList.add('visited');
+                }
+            });
+        });
+    }
+    
+    // Initialize visited links tracking
+    applyVisitedState();
+    trackArticleClicks();
+    
     // View mode management
     const viewModeKey = 'view_mode';
     const articlesContainer = document.getElementById('articlesContainer');

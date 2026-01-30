@@ -15,6 +15,10 @@ if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
 $path = strtok($uri, '?');
 
 // Admin routes
+if (preg_match('#^/admin/statistics$#', $path)) {
+    require __DIR__ . '/admin/statistics.php';
+    exit;
+}
 if (preg_match('#^/admin/sites$#', $path)) {
     require __DIR__ . '/admin/sites.php';
     exit;
@@ -60,6 +64,24 @@ if (preg_match('#^/tags$#', $path)) {
 // About page
 if (preg_match('#^/about$#', $path)) {
     require __DIR__ . '/about/index.php';
+    exit;
+}
+
+// Privacy page
+if (preg_match('#^/privacy$#', $path)) {
+    require __DIR__ . '/privacy/index.php';
+    exit;
+}
+
+// Terms page
+if (preg_match('#^/terms$#', $path)) {
+    require __DIR__ . '/terms/index.php';
+    exit;
+}
+
+// ZEN mode
+if (preg_match('#^/zen$#', $path)) {
+    require __DIR__ . '/zen/index.php';
     exit;
 }
 
